@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BOGOS: Free Gift Bundle Upsell</title>
+<style>
+@font-face{font-family:"Inter";src:url(assets/fonts/inter-latin.woff2) format("woff2");font-weight:100 900;font-display:swap}
+:root{
+  --text:#303030; --muted:#616161; --line:#e3e3e3; --soft:#f6f6f7; --black:#000;
+  --green:#36fba1; --badge:#e5f0fd; --badge-text:#00527c; --star:#303030;
+  --radius:12px; --max:1280px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"Inter",Helvetica,Arial,sans-serif;color:var(--text);background:#fff;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img{max-width:100%;display:block}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+.container{max-width:var(--max);margin:0 auto;padding:0 40px}
+.u{text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- Header ---------- */
+.header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid transparent}
+.header.scrolled{border-color:var(--line)}
+.header .container{display:flex;align-items:center;gap:24px;height:68px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;text-decoration:none;white-space:nowrap}
+.logo img{width:22px;height:24px}
+.search{flex:1;max-width:520px;margin:0 auto;position:relative}
+.search input{width:100%;height:42px;border-radius:999px;border:1px solid var(--line);background:var(--soft);padding:0 16px 0 42px;font:inherit;font-size:15px;outline:none}
+.search input:focus{border-color:#8a8a8a;background:#fff}
+.search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
+.nav{display:flex;align-items:center;gap:24px;white-space:nowrap}
+.nav a{text-decoration:none;font-weight:500}
+.nav .browse{display:flex;align-items:center;gap:6px}
+.btn-black{background:#000;color:#fff;border-radius:999px;padding:11px 20px;font-weight:600;text-decoration:none;display:inline-block}
+.icon-btn{display:none;width:40px;height:40px;align-items:center;justify-content:center;border-radius:50%}
+.icon-btn svg{width:22px;height:22px}
+.mobile-search{display:none;padding:0 16px 12px}
+.mobile-search.open{display:block}
+.drawer{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:.2s}
+.drawer.open{opacity:1;pointer-events:auto}
+.drawer-panel{position:absolute;right:0;top:0;bottom:0;width:min(320px,85vw);background:#fff;padding:20px;transform:translateX(100%);transition:.25s;display:flex;flex-direction:column;gap:4px}
+.drawer.open .drawer-panel{transform:none}
+.drawer-panel a{padding:12px 4px;text-decoration:none;font-weight:500;border-bottom:1px solid var(--line)}
+.drawer-panel .btn-black{margin-top:16px;text-align:center;border:0}
+
+/* ---------- Hero / app detail ---------- */
+.app{display:grid;grid-template-columns:300px 1fr;gap:56px;padding-top:32px;padding-bottom:64px}
+.side{position:sticky;top:100px;align-self:start}
+.app-head{display:flex;gap:16px;align-items:flex-start;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.app-icon{width:64px;height:64px;border-radius:12px;flex-shrink:0;object-fit:cover;background:#2f3dd1}
+.app-head h1{font-size:18px;font-weight:600;line-height:1.35}
+.bfs{display:inline-flex;align-items:center;gap:4px;background:var(--badge);color:var(--badge-text);font-size:11px;font-weight:500;border-radius:6px;padding:2px 6px;margin-top:6px}
+.bfs svg{width:12px;height:12px}
+.meta{padding:16px 0;border-bottom:1px solid var(--line)}
+.meta dt{font-weight:600;font-size:13px}
+.meta dd{color:var(--muted);font-size:13px}
+.meta .rating{display:flex;align-items:center;gap:4px;color:var(--text)}
+.meta .rating a{color:var(--text)}
+.star{width:14px;height:14px;fill:var(--star)}
+.install{display:block;width:100%;text-align:center;margin-top:24px;padding:13px;font-size:15px}
+.demo{display:block;text-align:center;margin-top:14px;font-weight:600}
+
+.gallery{display:grid;grid-template-columns:3fr 1fr;gap:12px}
+.gallery .main{position:relative;aspect-ratio:16/9;border-radius:var(--radius);overflow:hidden;background:#1d1f6b}
+.gallery img{width:100%;height:100%;object-fit:cover}
+.play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.play span{width:68px;height:48px;background:#ff0000;border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(0,0,0,.35)}
+.play svg{width:22px;height:22px;fill:#fff}
+.thumbs{display:grid;grid-template-rows:repeat(3,1fr);gap:12px}
+.thumbs button{position:relative;border-radius:10px;overflow:hidden;background:#e9e9ff;padding:0}
+.more{position:absolute;inset:0;background:rgba(0,0,0,.45);color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;font-size:15px}
+
+.desc{margin-top:36px;max-width:760px}
+.desc h2{font-size:20px;font-weight:700;line-height:1.35;margin-bottom:16px}
+.desc p{font-size:15px;color:var(--text);line-height:1.6}
+.desc ul{margin:20px 0 0 22px;font-size:15px;line-height:1.6}
+.desc li{margin-bottom:6px}
+
+.details{margin-top:36px;max-width:760px}
+.row{display:grid;grid-template-columns:160px 1fr;gap:24px;padding:20px 0;border-top:1px solid var(--line)}
+.row h3{font-size:14px;font-weight:600}
+.row .v{font-size:14px}
+.cat{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding-bottom:14px}
+.cat + .cat{padding-top:14px;border-top:1px solid var(--line)}
+.cat > div{flex:1}
+.cat .toggle{background:var(--soft);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:500;white-space:nowrap}
+.features{display:none;margin-top:12px}
+.features.open{display:block}
+.features h4{font-size:13px;font-weight:600;margin:12px 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{background:var(--soft);border-radius:999px;padding:4px 10px;font-size:12px}
+
+/* ---------- Pricing ---------- */
+.pricing{background:var(--soft);padding:64px 0}
+.section-title{font-size:24px;font-weight:700}
+.section-sub{color:var(--muted);margin-top:4px;font-size:15px}
+.plans{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:28px}
+.plan{background:#fff;border-radius:var(--radius);box-shadow:0 0 0 1px var(--line);padding:20px;display:flex;flex-direction:column}
+.plan .name{font-size:13px;color:var(--muted)}
+.plan h3{font-size:24px;font-weight:700;margin-top:2px}
+.plan h3 small{font-size:14px;font-weight:400;color:var(--muted)}
+.plan .save{color:#047b5d;font-size:13px;margin-top:4px}
+.plan .note{font-size:13px;color:var(--muted);margin-top:8px;min-height:60px}
+.plan .ft{font-weight:600;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.plan ul{list-style:none;margin-top:8px;font-size:13px;flex:1}
+.plan li{position:relative;padding-left:20px;margin-bottom:6px}
+.plan li::before{content:"";position:absolute;left:2px;top:5px;width:9px;height:5px;border-left:1.6px solid #303030;border-bottom:1.6px solid #303030;transform:rotate(-45deg)}
+.plan .trial{margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.fine{font-size:13px;color:var(--muted);margin-top:20px}
+
+/* ---------- Reviews ---------- */
+.reviews{display:grid;grid-template-columns:240px 1fr;gap:56px;padding:64px 40px}
+.overall{position:sticky;top:100px;align-self:start}
+.overall h4{font-weight:600;margin-top:16px}
+.big{display:flex;align-items:center;gap:8px;font-size:36px;font-weight:700;line-height:1.2;margin-top:4px}
+.big .star{width:18px;height:18px}
+.bars{margin-top:12px}
+.bar{display:grid;grid-template-columns:12px 14px 1fr 34px;align-items:center;gap:6px;font-size:13px;margin-bottom:6px}
+.bar .track{height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar .fill{height:100%;background:#303030}
+.bar a{text-align:right}
+.rv-btns{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-top:20px}
+.btn-outline{border:1px solid #c9c9c9;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:500;background:#fff}
+.summary{background:var(--soft);border-radius:var(--radius);padding:20px;margin-bottom:8px}
+.summary h3{font-weight:600;margin-bottom:6px}
+.summary p{font-size:14px}
+.review{display:grid;grid-template-columns:200px 1fr;gap:32px;padding:28px 0;border-bottom:1px solid var(--line)}
+.review .who b{display:block;font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.review .who span{display:block;font-size:13px;color:var(--muted);margin-top:4px}
+.review .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.review .stars{display:flex;gap:2px}
+.review .date{font-size:13px;color:var(--muted)}
+.review p{font-size:15px;line-height:1.6}
+.reply{margin-top:16px;padding-left:16px;border-left:2px solid var(--line)}
+.reply b{font-size:13px;font-weight:600}
+.reply span{font-size:13px;color:var(--muted)}
+.show-more{font-weight:600;margin-top:8px;text-decoration:underline}
+.clamp{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.pager{display:flex;gap:6px;justify-content:center;margin-top:28px}
+.pager a{min-width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;text-decoration:none;font-weight:500}
+.pager a.on{background:#000;color:#fff}
+
+/* ---------- Support ---------- */
+.support{display:grid;grid-template-columns:240px 1fr;gap:56px;padding:48px 40px;border-top:1px solid var(--line)}
+.support h2{font-size:20px;font-weight:700}
+.support > div:first-child p{color:var(--muted);margin-top:8px}
+.support .row{grid-template-columns:120px 1fr}
+.support .row:first-child{border-top:0;padding-top:0}
+.support .row a{display:block;font-weight:500;margin-bottom:6px}
+.addr{color:var(--muted);margin-top:4px}
+
+/* ---------- Similar ---------- */
+.similar{padding:16px 40px 72px}
+.similar h2{font-size:20px;font-weight:700;margin-bottom:20px}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:24px 48px}
+.card{display:flex;gap:14px;text-decoration:none;padding:8px;border-radius:10px;margin:-8px}
+.card:hover{background:var(--soft)}
+.card .ic{width:48px;height:48px;border-radius:10px;flex-shrink:0;object-fit:cover}
+.card b{font-weight:600}
+.card .r{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.card .r .star{width:11px;height:11px}
+.card p{font-size:13px}
+
+/* ---------- CTA + footer ---------- */
+.dark{background:#000;color:#fff}
+.cta{text-align:center;padding:72px 16px 56px}
+.cta h2{font-size:clamp(28px,5vw,44px);font-weight:700;letter-spacing:-.02em}
+.cta a{display:inline-block;margin-top:20px;background:var(--green);color:#000;font-weight:600;border-radius:999px;padding:12px 22px;text-decoration:none}
+.foot{display:grid;grid-template-columns:120px repeat(4,1fr);gap:24px;padding:40px 0;border-top:1px solid #2a2a2a}
+.foot h4{font-weight:600;margin-bottom:16px}
+.foot a{display:block;text-decoration:none;color:#e3e3e3;margin-bottom:12px;font-size:13px}
+.foot a:hover{color:#fff}
+.foot-bottom{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0 32px;border-top:1px solid #2a2a2a;flex-wrap:wrap}
+.foot-bottom nav{display:flex;gap:20px;flex-wrap:wrap}
+.foot-bottom a{text-decoration:none;color:#e3e3e3;font-size:13px}
+.lang{display:flex;align-items:center;gap:8px;font-size:13px}
+
+/* Lightbox */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.lightbox.open{display:flex}
+.lightbox img{max-height:85vh;border-radius:10px}
+.lb-btn{position:absolute;color:#fff;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.15);font-size:22px;display:flex;align-items:center;justify-content:center}
+.lb-close{top:16px;right:16px}.lb-prev{left:16px;top:50%}.lb-next{right:16px;top:50%}
+
+/* Mobile sticky install */
+.sticky-install{display:none}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1100px){
+  .plans{grid-template-columns:repeat(2,1fr)}
+  .foot{grid-template-columns:repeat(4,1fr)}
+  .foot .fl{display:none}
+}
+@media (max-width:960px){
+  .container{padding:0 24px}
+  .nav .browse,.nav .login{display:none}
+  .app{grid-template-columns:1fr;gap:28px}
+  .side{position:static}
+  .meta-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;border-bottom:1px solid var(--line)}
+  .meta-wrap .meta{border:0}
+  .install,.demo{display:inline-block;width:auto}
+  .side-actions{display:flex;align-items:center;gap:20px}
+  .side-actions .install{margin-top:20px;padding:12px 40px}
+  .side-actions .demo{margin-top:20px}
+  .reviews,.support{grid-template-columns:1fr;gap:28px;padding-left:24px;padding-right:24px}
+  .overall{position:static}
+  .similar{padding-left:24px;padding-right:24px}
+}
+@media (max-width:720px){
+  .container{padding:0 16px}
+  .search{display:none}
+  .icon-btn{display:flex}
+  .nav{margin-left:auto;gap:8px}
+  .nav .btn-black{display:none}
+  .header .container{height:60px;gap:8px}
+  .app{padding-top:20px}
+  .meta-wrap{grid-template-columns:1fr 1fr}
+  .meta-wrap .meta:last-child{grid-column:span 2;padding-top:0}
+  .side-actions{flex-direction:column;align-items:stretch;gap:0}
+  .side-actions .install{width:100%}
+  .gallery{display:block}
+  .thumbs{display:flex;grid-template-rows:none;overflow-x:auto;scroll-snap-type:x mandatory;margin-top:10px;gap:8px;padding-bottom:4px}
+  .thumbs button{flex:0 0 42%;aspect-ratio:16/9;scroll-snap-align:start}
+  .row{grid-template-columns:1fr;gap:8px}
+  .pricing{padding:44px 0}
+  .plans{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:24px -16px 0;padding:2px 16px 8px}
+  .plan{flex:0 0 82%;scroll-snap-align:start}
+  .reviews,.support,.similar{padding-left:16px;padding-right:16px}
+  .reviews{padding-top:44px;padding-bottom:44px}
+  .review{grid-template-columns:1fr;gap:10px;padding:22px 0}
+  .review .who{display:flex;flex-wrap:wrap;gap:0 10px;align-items:baseline}
+  .review .who span{margin-top:0}
+  .support .row{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr}
+  .foot{grid-template-columns:1fr 1fr;gap:8px 16px}
+  .foot-bottom{flex-direction:column;align-items:flex-start}
+  body{padding-bottom:76px}
+  .sticky-install{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;background:#fff;border-top:1px solid var(--line);padding:12px 16px;gap:12px;align-items:center;transform:translateY(110%);transition:transform .2s}
+  .sticky-install.show{transform:none}
+  .sticky-install img{width:40px;height:40px;border-radius:8px}
+  .sticky-install div{flex:1;min-width:0}
+  .sticky-install b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sticky-install span{font-size:12px;color:var(--muted)}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header" id="header">
+  <div class="container">
+    <a href="#" class="logo" aria-label="Shopify App Store home">
+      <img src="assets/img/shopify-logo.svg" alt="" width="22" height="24">
+      <span>Shopify App Store</span>
+    </a>
+    <form class="search" role="search" onsubmit="return false">
+      <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.8"/><path d="m14 14 3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input type="search" placeholder="Search apps, guides, and more" aria-label="Search">
+    </form>
+    <nav class="nav">
+      <a href="#" class="browse">Browse apps <svg width="12" height="12" viewBox="0 0 12 12"><path d="m3 4.5 3 3 3-3" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
+      <a href="#" class="login">Log in</a>
+      <a href="#" class="btn-black">Start for free</a>
+      <button class="icon-btn" id="searchToggle" aria-label="Search"><svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.8"/><path d="m14 14 3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+      <button class="icon-btn" id="menuToggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </nav>
+  </div>
+  <div class="mobile-search" id="mobileSearch">
+    <form class="search" style="display:block;max-width:none" onsubmit="return false">
+      <svg viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.8"/><path d="m14 14 3.5 3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <input type="search" placeholder="Search apps, guides, and more" aria-label="Search">
+    </form>
+  </div>
+</header>
+
+<div class="drawer" id="drawer">
+  <div class="drawer-panel">
+    <button style="align-self:flex-end;font-size:24px" id="drawerClose" aria-label="Close">&times;</button>
+    <a href="#">Browse apps</a>
+    <a href="#">Categories</a>
+    <a href="#">Log in</a>
+    <a href="#" class="btn-black">Start for free</a>
+  </div>
+</div>
+
+<main>
+  <!-- App detail -->
+  <section class="container app">
+    <aside class="side" id="side">
+      <div class="app-head">
+        <img class="app-icon" src="assets/img/bogos-icon.png" alt="BOGOS icon">
+        <div>
+          <h1>BOGOS: Free Gift Bundle Upsell</h1>
+          <span class="bfs"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5 9.6 3l2.2-.2.4 2.2 1.9 1.1-.9 2 .9 2-1.9 1.1-.4 2.2-2.2-.2L8 14.5 6.4 13l-2.2.2-.4-2.2-1.9-1.1.9-2-.9-2L3.8 5l.4-2.2 2.2.2L8 1.5Z" fill="currentColor"/><path d="m5.6 8 1.6 1.6 3.2-3.2" stroke="#fff" stroke-width="1.3"/></svg>Built for Shopify</span>
+        </div>
+      </div>
+      <div class="meta-wrap">
+        <dl class="meta"><dt>Pricing</dt><dd>Free plan available. Free trial available.</dd></dl>
+        <dl class="meta"><dt>Rating</dt><dd class="rating">5.0 <svg class="star" viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.5 7.7l5.9-.9L10 1.5z"/></svg> <a href="#reviews" class="u">(4,485)</a></dd></dl>
+        <dl class="meta"><dt>Developer</dt><dd><a href="#support" class="u" style="color:var(--text)">BOGOS</a></dd></dl>
+      </div>
+      <div class="side-actions">
+        <a href="#" class="btn-black install">Install</a>
+        <a href="#" class="demo u">View demo store</a>
+      </div>
+    </aside>
+
+    <div>
+      <div class="gallery" id="gallery">
+        <div class="main" data-i="0">
+          <img src="assets/img/shot-0.jpg" alt="Promo video">
+          <div class="play"><span><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></div>
+        </div>
+        <div class="thumbs">
+          <button data-i="1"><img src="assets/img/shot-1.jpg" alt="Screenshot 1"></button>
+          <button data-i="2"><img src="assets/img/shot-2.jpg" alt="Screenshot 2"></button>
+          <button data-i="3"><img src="assets/img/shot-3.jpg" alt="Screenshot 3"><span class="more">+ 9 more</span></button>
+        </div>
+      </div>
+
+      <div class="desc">
+        <h2>Break BFCM sales record with BOGO, buy x get y, free gift, bundles, discounts, and checkout upsell</h2>
+        <p>Over 12 years, 95K+ brands have trusted BOGOS to run offers seamlessly at scale, drive more orders, and elevate shopping experience. An easy-to-use app for creating BOGO, free gifts with purchase, bundles, discounts, and upsells. All widgets are fully customizable and built to convert. BOGOS supports POS, Headless API, auto-sync inventory, targeting, translation, and subscription. Prompt human chat, technical support are always available, backed by helpful video tutorials &amp; AI assistant.</p>
+        <ul>
+          <li>Auto-add to cart or show a free gift popup for buy one get one, BXGY, and GWP</li>
+          <li>Create product bundles, bundle builder (build a box), and mix and match bundles</li>
+          <li>Set up volume discounts, tiered discounts, cart discount, discount on cheapest</li>
+          <li>Checkout upsell using discount code, frequently bought together &amp; thank you page</li>
+          <li>Promote offers with progress bar, announcement bar, today offer, and offer page</li>
+        </ul>
+      </div>
+
+      <div class="details">
+        <div class="row"><h3>Languages</h3><div class="v">English, French, Japanese, German, Spanish, Dutch, Italian, and Chinese (Simplified)</div></div>
+        <div class="row"><h3>Works with</h3><div class="v">Checkout · Shopify POS · Shopify Flow · Shopify Admin · Cart Drawers - Slide Cart · Facebook Pixels · Gift card · Headless - Hydrogen · Subscriptions · Transcy</div></div>
+        <div class="row"><h3>Categories</h3>
+          <div class="v">
+            <div class="cat"><div><a href="#" class="u" style="font-weight:500">Product bundles</a>
+              <div class="features">
+                <h4>Bundle types</h4><div class="chips" data-list="Fixed bundles|Multipacks|Mix-and-match bundles|Variant bundles|Build a box|Sample packs|Subscription boxes|Upsell bundles|Cross-sell bundles|Frequently bought together|Related products|Digital products|Physical products|Custom bundles"></div>
+                <h4>Pricing you can set</h4><div class="chips" data-list="Fixed pricing|Tiered pricing|Quantity breaks|Discounts|Volume discounts|Flat discounts|Percentage discounts|Cart discounts|Free shipping|BOGO|Subscriptions|Bulk pricing|Dynamic pricing|Custom pricing"></div>
+              </div></div><button class="toggle">Show features</button></div>
+            <div class="cat"><div><a href="#" class="u" style="font-weight:500">Discounts</a>
+              <div class="features">
+                <h4>Discount types</h4><div class="chips" data-list="Discount codes|BOGO|Fixed pricing|Tiered pricing|Volume discounts|Quantity breaks|Flat discounts|Percentage discounts|Bulk discounts|Free shipping|Shipping rates|Cart discounts|Checkout discounts|Gifts|Rewards|Subscriptions|Product bundles|Limited time offers|Countdown timers|Upsell discounts|Cross-sell discounts|Pop-ups|Dynamic pricing|Custom discounts"></div>
+                <h4>Managing discounts</h4><div class="chips" data-list="Templates|Bulk editing|Import and export|Custom code|Currency conversion|Localization|Campaigns|Triggers and rules|Discount stacking|Targeting|Geolocation|Filtering|Tracking|Reporting|Analytics"></div>
+              </div></div><button class="toggle">Show features</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <h2 class="section-title">Pricing</h2>
+      <p class="section-sub">Choose the plan that best fits your business.</p>
+      <div class="plans">
+        <div class="plan">
+          <div class="name">Free</div><h3>Free</h3>
+          <div class="note"></div>
+          <div class="ft">Features</div>
+          <ul><li>30 free orders lifetime by BOGOS</li><li>BOGO, BXGY &amp; free gift with purchase</li><li>Custom bundle, mix and match</li><li>Volume discount, bulk product discount</li><li>Frequently bought together</li><li>Progress bar, announcement bar</li><li>Real-time analytics</li><li>Live chat, video &amp; email support</li></ul>
+        </div>
+        <div class="plan">
+          <div class="name">Basic</div><h3>$29.99 <small>/ month</small></h3>
+          <div class="save">or $287.99/year and save 20%</div>
+          <div class="note">300 monthly free orders by BOGOS, $0.05 per extra</div>
+          <div class="ft">Features</div>
+          <ul><li>Only for Shopify Basic stores</li><li>All features in Free Plan</li><li>AI Assistant</li><li>Bundle builder (build a box)</li><li>Work with other offers</li><li>Run offers on the POS and mobile app</li><li>Integration</li><li>Multiplier gifts</li></ul>
+          <div class="trial">7-day free trial</div>
+        </div>
+        <div class="plan">
+          <div class="name">Grow</div><h3>$49.99 <small>/ month</small></h3>
+          <div class="save">or $479.99/year and save 20%</div>
+          <div class="note">600 monthly free orders by BOGOS, $0.05 per extra. $69.99 for Advanced/Unlimited shops with 1000 free orders</div>
+          <div class="ft">Features</div>
+          <ul><li>For Grow/Shopify/Professional stores</li><li>All features in Basic Plan</li></ul>
+          <div class="trial">7-day free trial</div>
+        </div>
+        <div class="plan">
+          <div class="name">Plus</div><h3>$109.99 <small>/ month</small></h3>
+          <div class="save">or $1,055.99/year and save 20%</div>
+          <div class="note">2000 monthly free orders by BOGOS, $0.05 per extra</div>
+          <div class="ft">Features</div>
+          <ul><li>Only for Shopify Plus stores</li><li>All premium features</li><li>Checkout upsell</li><li>Headless/Hydrogen API</li><li>Comprehensive support with priority</li></ul>
+          <div class="trial">7-day free trial</div>
+        </div>
+      </div>
+      <p class="fine">All charges are billed in USD. Recurring and usage-based charges are billed every 30 days. <a href="#" class="u">See all pricing options</a></p>
+    </div>
+  </section>
+
+  <!-- Reviews -->
+  <section class="reviews" id="reviews" style="max-width:var(--max);margin:0 auto">
+    <div class="overall">
+      <h2 class="section-title" style="font-size:20px">Reviews <span style="font-weight:400">(4,485)</span></h2>
+      <h4>Overall rating</h4>
+      <div class="big">5 <span id="bigStars" style="display:flex;gap:2px"></span></div>
+      <div class="bars" id="bars"></div>
+      <div class="rv-btns">
+        <button class="btn-outline">Write a review</button>
+        <button class="btn-outline">All reviews</button>
+      </div>
+    </div>
+    <div>
+      <div class="summary">
+        <h3>What merchants think</h3>
+        <p>Merchants highlight higher order values from gift, bundle and BXGY offers, smooth performance during big sales, a clean interface that fits custom themes, and a fast, hands-on support team.</p>
+      </div>
+      <div id="reviewList"></div>
+      <nav class="pager"><a href="#" class="on">1</a><a href="#">2</a><a href="#">3</a><a href="#">…</a><a href="#">449</a><a href="#">›</a></nav>
+    </div>
+  </section>
+
+  <!-- Support -->
+  <section class="support" id="support" style="max-width:var(--max);margin:0 auto">
+    <div><h2>Support</h2><p>App support provided by BOGOS.</p></div>
+    <div>
+      <div class="row"><h3>Resources</h3><div><a href="#" class="u">Privacy policy</a><a href="#" class="u">FAQ</a></div></div>
+      <div class="row"><h3>Developer</h3><div><a href="#" class="u">BOGOS</a><a href="#" class="u">Website</a><div class="addr">Tang 3, Toa nha IPH, 241 Xuan Thuy, Phuong Cau Giay, Hanoi, 100000, VN</div></div></div>
+      <div class="row"><h3>Launched</h3><div>December 17, 2014</div></div>
+    </div>
+  </section>
+
+  <!-- Similar apps -->
+  <section class="similar" style="max-width:var(--max);margin:0 auto">
+    <h2>More apps like this</h2>
+    <div class="cards" id="cards"></div>
+  </section>
+</main>
+
+<footer class="dark">
+  <div class="cta">
+    <h2>Want to add an app?</h2>
+    <a href="#">Try Shopify free for 3 days</a>
+  </div>
+  <div class="container">
+    <div class="foot">
+      <div class="fl"><img src="assets/img/shopify-logo-white.svg" alt="Shopify" width="32" height="36"></div>
+      <div><h4>App categories</h4><a href="#">Sales channels</a><a href="#">Finding products</a><a href="#">Selling products</a><a href="#">Orders and shipping</a><a href="#">Store design</a><a href="#">Marketing and conversion</a><a href="#">Store management</a></div>
+      <div><h4>Top categories</h4><a href="#">Dropshipping</a><a href="#">Marketplaces</a><a href="#">Product reviews</a><a href="#">Upsell and bundles</a><a href="#">Email marketing</a><a href="#">SEO</a><a href="#">Shipping</a><a href="#">Currency and translation</a></div>
+      <div><h4>Resources</h4><a href="#">Shopify Help Center</a><a href="#">API documentation</a><a href="#">Shopify Community</a><a href="#">Community Events</a><a href="#">Shopify Blog</a><a href="#">Research</a></div>
+      <div><h4>Shopify</h4><a href="#">About</a><a href="#">Careers</a><a href="#">Investors</a><a href="#">Press and media</a><a href="#">Partners</a><a href="#">Affiliates</a><a href="#">Legal</a><a href="#">Service status</a></div>
+    </div>
+    <div class="foot-bottom">
+      <nav><a href="#">Developer login</a><a href="#">Terms of service</a><a href="#">Privacy policy</a><a href="#">Sitemap</a><a href="#">Your privacy choices</a></nav>
+      <div class="lang"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.4"/><path d="M2 10h16M10 2c2.5 2.7 2.5 13.3 0 16M10 2c-2.5 2.7-2.5 13.3 0 16" stroke="#fff" stroke-width="1.4"/></svg>English</div>
+    </div>
+  </div>
+</footer>
+
+<!-- Mobile sticky install bar -->
+<div class="sticky-install" id="stickyInstall">
+  <img src="assets/img/bogos-icon.png" alt="">
+  <div><b>BOGOS: Free Gift Bundle Upsell</b><span>5.0 ★ (4,485) · Free plan available</span></div>
+  <a href="#" class="btn-black">Install</a>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-btn lb-close" aria-label="Close">&times;</button>
+  <button class="lb-btn lb-prev" aria-label="Previous">‹</button>
+  <img id="lbImg" alt="">
+  <button class="lb-btn lb-next" aria-label="Next">›</button>
+</div>
+
+<script src="assets/reviews.js"></script>
+<script>
+const STAR = '<svg class="star" viewBox="0 0 20 20"><path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9l-5.2 2.7 1-5.8L1.5 7.7l5.9-.9L10 1.5z"/></svg>';
+const stars = n => STAR.repeat(n);
+const $ = s => document.querySelector(s);
+
+// Chips
+document.querySelectorAll('.chips').forEach(c => c.innerHTML = c.dataset.list.split('|').map(t => `<span>${t}</span>`).join(''));
+document.querySelectorAll('.cat .toggle').forEach(b => b.onclick = () => {
+  const f = b.parentElement.querySelector('.features');
+  f.classList.toggle('open');
+  b.textContent = f.classList.contains('open') ? 'Hide features' : 'Show features';
+});
+
+// Rating bars
+$('#bigStars').innerHTML = stars(5);
+const dist = [[5,4334,'4.3K'],[4,92,'92'],[3,8,'8'],[2,11,'11'],[1,38,'38']];
+$('#bars').innerHTML = dist.map(([s,n,l]) => `<div class="bar"><span>${s}</span>${STAR}<div class="track"><div class="fill" style="width:${Math.max(n/4485*100,.8)}%"></div></div><a href="#" class="u">${l}</a></div>`).join('');
+
+const reviews = window.REVIEWS || [];
+$('#reviewList').innerHTML = reviews.map(r => `
+  <article class="review">
+    <div class="who"><b>${r.name}</b><span>${r.country}</span><span>${r.time}</span></div>
+    <div>
+      <div class="top"><div class="stars">${stars(5)}</div><span class="date">${r.date}</span></div>
+      <p class="${r.text.length>220?'clamp':''}">${r.text}</p>
+      ${r.text.length>220?'<button class="show-more">Show more</button>':''}
+      ${r.reply?`<div class="reply"><b>BOGOS replied</b> <span>${r.reply.date}</span><p class="clamp" style="font-size:14px;margin-top:6px">${r.reply.text}</p></div>`:''}
+    </div>
+  </article>`).join('');
+document.querySelectorAll('.show-more').forEach(b => b.onclick = () => {
+  const p = b.previousElementSibling; p.classList.toggle('clamp');
+  b.textContent = p.classList.contains('clamp') ? 'Show more' : 'Show less';
+});
+
+// Similar apps
+const apps = [
+  {n:'Pumper Bundles Quantity Breaks',r:'4.9',c:'3,562',p:'Free plan available',d:'Bundle offers, free gifts and volume discounts to lift AOV',img:'assets/img/app-pumper.png'},
+  {n:'SMART Bundles Volume Discounts',r:'5.0',c:'457',p:'Free',d:'Product bundles, BOGO, quantity breaks and gifts to grow AOV',img:'assets/img/app-smart.jpg'},
+  {n:'Moon Bundles CartDrawer Upsell',r:'5.0',c:'663',p:'Free plan available',d:'Slide cart, free gifts, post-purchase, BOGO and quantity breaks',img:'assets/img/app-moon.png'}
+];
+$('#cards').innerHTML = apps.map(a => `
+  <a href="#" class="card"><img class="ic" src="${a.img}" alt="${a.n} icon">
+    <div><b>${a.n}</b><div class="r">${a.r} ${STAR} (${a.c}) · ${a.p}</div><p>${a.d}</p>
+    <span class="bfs">Built for Shopify</span></div></a>`).join('');
+
+// Header border, mobile search & drawer
+addEventListener('scroll', () => {
+  $('#header').classList.toggle('scrolled', scrollY > 4);
+  const side = $('#side').getBoundingClientRect();
+  $('#stickyInstall').classList.toggle('show', side.bottom < 0);
+}, {passive:true});
+$('#searchToggle').onclick = () => $('#mobileSearch').classList.toggle('open');
+$('#menuToggle').onclick = () => $('#drawer').classList.add('open');
+$('#drawerClose').onclick = () => $('#drawer').classList.remove('open');
+$('#drawer').onclick = e => { if (e.target.id === 'drawer') e.target.classList.remove('open'); };
+
+// Lightbox gallery
+const shots = [0,1,2,3,4,5].map(i => `assets/img/shot-${i}.jpg`);
+let cur = 0;
+const show = i => { cur = (i + shots.length) % shots.length; $('#lbImg').src = shots[cur]; $('#lightbox').classList.add('open'); };
+document.querySelectorAll('#gallery [data-i]').forEach(el => el.onclick = () => show(+el.dataset.i));
+$('.lb-close').onclick = () => $('#lightbox').classList.remove('open');
+$('.lb-prev').onclick = () => show(cur - 1);
+$('.lb-next').onclick = () => show(cur + 1);
+addEventListener('keydown', e => {
+  if (!$('#lightbox').classList.contains('open')) return;
+  if (e.key === 'Escape') $('#lightbox').classList.remove('open');
+  if (e.key === 'ArrowLeft') show(cur - 1);
+  if (e.key === 'ArrowRight') show(cur + 1);
+});
+</script>
+</body>
+</html>
